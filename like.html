@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Like</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <main>
+        <section>
+            <header>
+                <img class="home" src="assets/logo.webp" alt="Tio logo">
+            </header>
+
+            <div class="likes-container">
+            </div>
+
+            <footer>
+                <button class="is-remove" aria-label="remove"></button>
+                <button class="is-fav" aria-label="fav"></button>
+            </footer>
+        </section>
+    </main>
+
+    <script type="module" src="script.js"></script>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
+        import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
+
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyAb7lVRfkmZQtLBzP46OYUsCyjqev3YTA0",
+            authDomain: "fotosfamiliaresixc.firebaseapp.com",
+            projectId: "fotosfamiliaresixc",
+            storageBucket: "fotosfamiliaresixc.firebasestorage.app",
+            messagingSenderId: "791880344035",
+            appId: "1:791880344035:web:2bc7d11406baeb17fb00d6"
+        };
+
+        // Inicializar Firebase y Firestore
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // Función para cargar los likes desde Firestore
+        async function loadLikes() {
+            const likesContainer = document.querySelector('.likes-container');
+
+            try {
+                const querySnapshot = await getDocs(collection(db, 'Calificaciones')); // Reemplaza 'Calificaciones' con el nombre de tu colección en Firestore
+                querySnapshot.forEach((doc) => {
+                    // Aquí estamos suponiendo que cada documento tiene un campo 'likes' que contiene el número de likes
+                    const data = doc.data();
+                    const url = data.url;  
+                    const alt = data.alt;
+                    const title = data.title;
+                    const descrip = data.descrip;
+                    const likes = data.like || 0;
+
+                    const likeElement = document.createElement('div');
+                    likeElement.classList.add('like-item');
+                    likeElement.innerHTML = `
+                    <img src="${url}" alt="${alt}">
+                    <h2> ${title}</h2>
+                    <p>Likes: ${likes}</p>
+                    `;
+                    likesContainer.appendChild(likeElement);
+                });
+            } catch (error) {
+                console.error("Error al cargar los likes:", error);
+            }
+        }
+
+        // Cargar los likes cuando la página esté lista
+        document.addEventListener('DOMContentLoaded', loadLikes);
+    </script>
+</body>
+
+</html>
